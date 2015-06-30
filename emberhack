@@ -19,7 +19,14 @@ fi
 
 if heroku apps | grep "^$1\$"
 then
-    echo "There's already a heroku app called '$1'."
+    echo "You already have a heroku app called '$1'."
+    exit 1
+fi
+
+# exit if app name is taken
+if heroku apps:info --app=$1 2>&1 >/dev/null | grep 'You do not have access'
+then
+    echo "Somebody else already claimed the heroku app name '$1'."
     exit 1
 fi
 
@@ -31,7 +38,13 @@ fi
 
 if heroku apps | grep "^$1-api\$"
 then
-    echo "There's already a heroku app called '$1-api'."
+    echo "You already have a heroku app called '$1-api'."
+    exit 1
+fi
+
+if heroku apps:info --app=$1-api 2>&1 >/dev/null | grep 'You do not have access'
+then
+    echo "Somebody else already claimed the heroku app name '$1-api'."
     exit 1
 fi
 
@@ -53,6 +66,12 @@ bb create $1 --private
 git remote add origin git@bitbucket.org:gregsabo/$1.git
 git push -u origin --all
 git push -u origin --tags
+
+# Deploy to heroku
+heroku create --buildpack https://github.com/tonycoco/heroku-buildpack-ember-cli.git
+git push heroku master
+heroku apps:rename $1
+
 cd ..
 
 # Make API app
@@ -70,14 +89,10 @@ bb create $1-api --private
 git remote add origin git@bitbucket.org:gregsabo/$1-api.git
 git push -u origin --all
 git push -u origin --tags
+
+# Deploy to heroku
+heroku create
+git push heroku master
+heroku apps:rename $1-api
+
 cd ..
-
-# Make repos
-# cd frontend
-# bb create_from_local --private
-# git push origin master
-
-# heroku create --buildpack https://github.com/tonycoco/heroku-buildpack-ember-cli.git
-# git push heroku master
-
-# heroku apps:rename $1
