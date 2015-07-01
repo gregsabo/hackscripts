@@ -73,12 +73,12 @@ cd ..
 # cookiecutter --no-input https://github.com/JackStouffer/cookiecutter-Flask-Foundation
 cookiecutter --no-input https://github.com/sloria/cookiecutter-flask
 cd api
-make env
+virtualenv env
 . env/bin/activate
+pip install -r requirements/dev.txt
 
 # Save to bitbucket
 git init
-cp ~/Dropbox/dev/hackscripts/.gitignore .
 git add .
 git commit -m "Initial commit."
 bb create $1-api --private
@@ -95,6 +95,8 @@ cd frontend
 heroku create --buildpack https://github.com/tonycoco/heroku-buildpack-ember-cli.git
 git push heroku master
 heroku apps:rename $1
+heroku config:set API_URL=http://$1-api.herokuapp.com/api/
+heroku config:set API_PREFIX_PATH=/api/
 
 cd ..
 cd api
