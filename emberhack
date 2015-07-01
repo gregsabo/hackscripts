@@ -67,28 +67,37 @@ git remote add origin git@bitbucket.org:gregsabo/$1.git
 git push -u origin --all
 git push -u origin --tags
 
-# Deploy to heroku
-heroku create --buildpack https://github.com/tonycoco/heroku-buildpack-ember-cli.git
-git push heroku master
-heroku apps:rename $1
-
 cd ..
 
 # Make API app
-cookiecutter --no-input https://github.com/JackStouffer/cookiecutter-Flask-Foundation
+# cookiecutter --no-input https://github.com/JackStouffer/cookiecutter-Flask-Foundation
+cookiecutter --no-input https://github.com/sloria/cookiecutter-flask
 cd api
 make env
 . env/bin/activate
 
 # Save to bitbucket
 git init
-curl https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore > .gitignore
+cp ~/Dropbox/dev/hackscripts/.gitignore .
 git add .
 git commit -m "Initial commit."
 bb create $1-api --private
 git remote add origin git@bitbucket.org:gregsabo/$1-api.git
 git push -u origin --all
 git push -u origin --tags
+
+# initial deploys (do this last)
+
+cd ..
+cd frontend
+
+# Deploy to heroku
+heroku create --buildpack https://github.com/tonycoco/heroku-buildpack-ember-cli.git
+git push heroku master
+heroku apps:rename $1
+
+cd ..
+cd api
 
 # Deploy to heroku
 heroku create
