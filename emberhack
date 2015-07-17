@@ -75,7 +75,6 @@ cookiecutter --no-input https://github.com/sloria/cookiecutter-flask
 cd api
 virtualenv env
 . env/bin/activate
-pip install -r requirements/dev.txt
 
 # Save to bitbucket
 git init
